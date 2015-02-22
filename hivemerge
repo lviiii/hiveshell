@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+
+if [[ -z $1 ]] ; then 
+  target=`git branch --no-color 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/\1/'`
+else 
+  target=$1
+fi
+
+for branch in `cat release/$target | awk '{print $1}'`
+do
+  commit=`git log $branch --oneline -1 2> /dev/null | awk '{print $1}'` 
+  echo "cherry-picking '$commit' from branch '$branch'"
+  git cherry-pick $commit
+  if [ $? -ne 0 ]; then
+    echo "Failed cherry-picking $commit from $branch" 
+    exit
+  fi
+done

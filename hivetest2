@@ -1,0 +1,143 @@
+#!/usr/bin/env bash
+
+THOME='/home/navis/apache/oss-hive'
+PROFILE='-Phadoop-2'
+
+if [ "$1" = "c" ] ; then
+  TEST='TestCliDriver'
+  TPATH='ql/src/test/queries/clientpositive'
+elif [ "$1" = "cm" ] ; then
+  TEST='TestCliDriver'
+  TPATH='ql/src/test/queries/clientpositive'
+  OPTION='-Dtest.output.overwrite=true'
+  PROFILE='-Phadoop-2'
+elif [ "$1" = "cn" ] ; then
+  TEST='TestNegativeCliDriver'
+  TPATH='ql/src/test/queries/clientnegative'
+elif [ "$1" = "cnm" ] ; then
+  TEST='TestNegativeCliDriver'
+  TPATH='ql/src/test/queries/clientnegative'
+  OPTION='-Dtest.output.overwrite=true'
+elif [ "$1" = "ccnm" ] ; then
+  TEST='TestContribNegativeCliDriver'
+  TPATH='contrib/src/test/queries/clientnegative'
+  OPTION='-Dtest.output.overwrite=true'
+elif [ "$1" = "ccm" ] ; then
+  TEST='TestContribCliDriver'
+  TPATH='contrib/src/test/queries/clientpositive'
+  OPTION='-Dtest.output.overwrite=true'
+elif [ "$1" = "m" ] ; then
+  TEST='TestMinimrCliDriver'
+  TPATH='ql/src/test/queries/clientpositive'
+elif [ "$1" = "mm" ] ; then
+  TEST='TestMinimrCliDriver'
+  TPATH='ql/src/test/queries/clientpositive'
+  OPTION='-Dtest.output.overwrite=true'
+elif [ "$1" = "mn" ] ; then
+  TEST='TestNegativeMinimrCliDriver'
+  TPATH='ql/src/test/queries/clientnegative'
+elif [ "$1" = "mnm" ] ; then
+  TEST='TestNegativeMinimrCliDriver'
+  TPATH='ql/src/test/queries/clientnegative'
+  OPTION='-Dtest.output.overwrite=true'
+elif [ "$1" = "p" ] ; then
+  TEST='TestParse'
+  TPATH='ql/src/test/queries/clientpositive'
+elif [ "$1" = "pm" ] ; then
+  TEST='TestParse'
+  TPATH='ql/src/test/queries/clientpositive'
+  OPTION='-Dtest.output.overwrite=true'
+elif [ "$1" = "pn" ] ; then
+  TEST='TestParseNegative'
+  TPATH='ql/src/test/queries/negative'
+elif [ "$1" = "pnm" ] ; then
+  TEST='TestParseNegative'
+  TPATH='ql/src/test/queries/negative'
+  OPTION='-Dtest.output.overwrite=true'
+elif [ "$1" = "h" ] ; then
+  TEST='TestHBaseCliDriver'
+  TPATH='hbase-handler/src/test/queries/positive'
+elif [ "$1" = "hm" ] ; then
+  TEST='TestHBaseCliDriver'
+  TPATH='hbase-handler/src/test/queries/positive'
+  OPTION='-Dtest.output.overwrite=true'
+elif [ "$1" = "hn" ] ; then
+  TEST='TestHBaseNegativeCliDriver'
+  TPATH='hbase-handler/src/test/queries/negative'
+elif [ "$1" = "hnm" ] ; then
+  TEST='TestHBaseNegativeCliDriver'
+  TPATH='hbase-handler/src/test/queries/negative'
+  OPTION='-Dtest.output.overwrite=true'
+elif [ "$1" = "hmm" ] ; then
+  TEST='TestHBaseMinimrCliDriver'
+  TPATH='hbase-handler/src/test/queries/positive'
+elif [ "$1" = "hmmm" ] ; then
+  TEST='TestHBaseMinimrCliDriver'
+  TPATH='hbase-handler/src/test/queries/positive'
+  OPTION='-Dtest.output.overwrite=true'
+elif [ "$1" = "t" ] ; then
+  TEST='TestMiniTezCliDriver'
+  TPATH='ql/src/test/queries/clientpositive'
+  PROFILE='-Phadoop-2'
+elif [ "$1" = "tm" ] ; then
+  TEST='TestMiniTezCliDriver'
+  TPATH='ql/src/test/queries/clientpositive'
+  OPTION='-Dtest.output.overwrite=true'
+  PROFILE='-Phadoop-2'
+elif [ "$1" = "a" ] ; then
+  TEST='TestAccumuloCliDriver'
+  TPATH='accumulo-handler/src/test/queries/positive'
+  PROFILE='-Phadoop-2'
+elif [ "$1" = "am" ] ; then
+  TEST='TestAccumuloCliDriver'
+  TPATH='accumulo-handler/src/test/queries/positive'
+  OPTION='-Dtest.output.overwrite=true'
+  PROFILE='-Phadoop-2'
+elif [ "$1" = "s" ] ; then
+  TEST='TestSparkCliDriver'
+  TPATH='ql/src/test/queries/clientpositive'
+  PROFILE='-Phadoop-2'
+elif [ "$1" = "sm" ] ; then
+  TEST='TestSparkCliDriver'
+  TPATH='ql/src/test/queries/clientpositive'
+  OPTION='-Dtest.output.overwrite=true'
+  PROFILE='-Phadoop-2'
+else 
+  TEST=$1
+fi
+
+shift
+
+if [ "$1" = "hadoop1" ] ; then
+  PROFILE='-Phadoop-1'
+  shift
+elif [ "$1" = "hadoop2" ] ; then
+  PROFILE='-Phadoop-2'
+  shift
+fi
+
+LIST=""
+for input in "$@"
+do
+if [ -z `echo $1 | grep '.q$'` ]; then
+  input=$input".q"
+fi
+
+for F in $THOME/$TPATH/$input
+do
+  if [[ -n $LIST ]] ; then
+    LIST=${LIST},`basename $F`
+  else
+    LIST=`basename $F`
+  fi
+done
+done
+
+if [[ ! -z $LIST ]] ; then
+  QFILES=-Dqfile=$LIST
+fi
+
+echo testing $TEST $LIST
+echo mvn test -Dtest=$TEST $QFILES $PROFILE $OPTION
+mvn test -Dtest=$TEST $QFILES $PROFILE $OPTION
+

@@ -1,0 +1,4 @@
+ant jar -Dmodule=ql -Dbuild.profile=nohcat $1
+cp build/ql/hive-exec-0.*.jar build/dist/lib/
+cp build/ql/hive-exec-0.*.jar build/ivy/lib/default/
+cp build/ql/hive-exec-0.*.jar build/ivy/lib/test/

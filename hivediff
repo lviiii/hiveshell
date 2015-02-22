@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+
+git diff --no-prefix HEAD^ > HIVE-$1.patch.txt

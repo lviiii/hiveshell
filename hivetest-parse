@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+
+input=$1
+if [ -z `echo $1 | grep '.q$'` ]; then
+  input=$input".q"
+fi
+
+LIST=""
+for F in ql/src/test/queries/positive/$input
+do
+  if [[ -n $LIST ]] ; then
+    LIST=${LIST},`basename $F`
+  else
+    LIST=`basename $F`
+  fi
+done
+
+echo testing $LIST
+ant test -Dtestcase=TestParse -Dqfile=$LIST -Dmodule=ql -Dtest.silent=false -Divy.checkmodified=false

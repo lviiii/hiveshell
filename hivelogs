@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+
+if [[ -z $1 ]] ; then 
+  target='apache'
+else 
+  target=$1
+fi
+
+for branch in `cat release/$target | awk '{print $1}'`
+do
+  if [[ $branch == \** ]] ;
+  then
+    continue
+  fi
+  git log --oneline -1 $branch
+done

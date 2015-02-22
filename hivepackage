@@ -1,0 +1,1 @@
+ant -Divy.checkmodified=false package $@

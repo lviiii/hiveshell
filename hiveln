@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+
+HIVE_ROOT=~/apache/oss-hive
+
+rm lib/*
+rm ~/hadoop-0.20/lib/hive-*
+find . -type l -exec unlink {} \;
+
+find $HIVE_ROOT/bak/lib$1 -type f -name "*.jar" | awk -F/ '{print "ln -s " $F " lib/" $NF}' | sh -x 
+find $HIVE_ROOT/bak/bin -type f -not -path '*/ext/*' | awk -F/ '{print "ln -f -s " $F " bin/" $NF}' | sh -x 
+
+find $HIVE_ROOT/ql/lib -type f -name "*.jar" | awk -F/ '{print "ln -s " $F " auxlib/" $NF}' | sh -x 
+find $HIVE_ROOT/spark-client/target -type f -name "spark-client*.jar" | awk -F/ '{print "ln -s " $F " lib/" $NF}' | sh -x 
+
+find $HIVE_ROOT/bak/bin/ext -type f -name "*.sh" | awk -F/ '{print "ln -f -s " $F " bin/ext/" $NF}' | sh -x 
+find ~/bin/lib -name "*.jar" | awk -F/ '{print "ln -s " $F " lib/" $NF}' | sh -x
+
+find $HIVE_ROOT/*/target/ -type f -not -path '*/packaging/*' -not -path '*/usercache/*' -not -path '*/itests/*' -name "hive-*$1*.jar" -not -name "hive-*$1*tests.jar" -not -name "hive-*$1*core.jar" | awk -F/ '{print "ln -f -s " $F " lib/" $NF}' | sh -x 
+find $HIVE_ROOT/*/*/target/ -type f -not -path '*/packaging/*' -not -path '*/usercache/*' -not -path '*/itests/*' -name "hive-*$1*.jar" -not -name "hive-*$1*tests.jar" | awk -F/ '{print "ln -f -s " $F " lib/" $NF}' | sh -x 
+find $HIVE_ROOT/hbase-handler/target/ -type f -not -path '*/packaging/*' -not -path '*/usercache/*' -name "hive-*$1*tests.jar" | awk -F/ '{print "ln -f -s " $F " lib/" $NF}' | sh -x 
+
+find $HBASE_HOME/lib -type f -name "hbase-*.jar" | awk -F/ '{print "ln -f -s " $F " lib/" $NF}' | sh -x 
+
+#ln -s /home/navis/apache/oss-hive/build/ql/test/test-udfs.jar lib/test-udf.jar
+#ln -s ~/projects/ndap-plugin/ndap-plugin-json/target/ndap-plugin-json-1.1.jar lib/ndap-plugin-json-1.1.jar
+
+hadoop fs -rmr /tez/hive
+hadoop fs -mkdir /tez/hive
+find ~/hive/lib -name hive-exec*.jar -exec hadoop fs -put {} /tez/hive/ \;

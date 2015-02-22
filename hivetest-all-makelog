@@ -1,0 +1,1 @@
+git checkout -f $1;ant clean package test -logfile logs/$1.log -Doffline=true -Doverwrite=true -Divy.checkmodified=false -Divy.skip=true -Dtest.continue.on.failure=true

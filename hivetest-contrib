@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+
+input=$1
+if [ -z `echo $1 | grep '.q$'` ]; then
+  input=$input".q"
+fi
+
+LIST=""
+for F in contrib/src/test/queries/clientpositive/$input
+do
+  if [[ -n $LIST ]] ; then
+    LIST=${LIST},`basename $F`
+  else
+    LIST=`basename $F`
+  fi
+done
+echo testing $LIST
+find ~/apache/oss-hive -name hive-*.jar -path '*/ivy/*' -exec rm {} \;
+find ~/.ivy2/cache -name hive-*.jar -exec rm {} \;
+ant test -Doffline=true -Dtestcase=TestContribDriver -Dqfile=$LIST -Dtest.silent=false

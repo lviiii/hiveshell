@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+if [[ -z $1 ]] ; then
+  git log --oneline -30
+elif [[ -z $2 ]] ; then
+  git log --oneline -300 | grep $1
+else
+  git log $1 --oneline -300 | grep $2
+fi

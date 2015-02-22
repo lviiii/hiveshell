@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+
+input=$1
+if [ -z `echo $1 | grep '.q$'` ]; then
+  input=$input".q"
+fi
+
+LIST=""
+for F in ql/src/test/queries/clientpositive/$input
+do
+  if [[ -n $LIST ]] ; then
+    LIST=${LIST},`basename $F`
+  else
+    LIST=`basename $F`
+  fi
+done
+
+echo testing $LIST
+ant test -Dtestcase=TestMinimrCliDriver -Dqfile=$LIST -Dtest.silent=false -Doverwrite=true $2 $3 -Divy.checkmodified=false -Dmodule=ql

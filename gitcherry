@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+commit=`git log $1 --oneline -1 2> /dev/null | awk '{print $1}'` 
+echo "cherry-picking '$commit'"
+git cherry-pick $commit $2
+if [ $? -ne 0 ]; then
+  echo "Failed cherry-picking $commit" 
+  exit
+fi

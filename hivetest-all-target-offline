@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+for branch in $@
+do
+  git checkout -f $branch
+  git log --oneline -1
+  ant -Doffline=true clean package test -logfile logs/$branch.log
+done

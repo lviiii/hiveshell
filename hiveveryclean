@@ -1,0 +1,6 @@
+find ~/apache/oss-hive -name hive-*.jar -exec rm {} \;
+find ~/.ivy2/cache -name hive-*.jar -exec rm {} \;
+find ~/.ivy2/local -name hive-*.jar -path */*SNAPSHOT/* -exec rm {} \;
+find ~/.m2 -name hive-*.jar -path */*SNAPSHOT/* -exec rm {} \;
+find ~/.m2 -name hive-*.pom -path */*SNAPSHOT/* -exec rm {} \;
+

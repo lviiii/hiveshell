@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+
+input=`cat $1`
+
+LIST=""
+for F in $input
+do
+  if [[ -n $LIST ]] ; then
+    LIST=${LIST},`basename $F`
+  else
+    LIST=`basename $F`
+  fi
+done
+
+echo testing $LIST
+ant package test -Dtestcase=TestCliDriver -Dqfile=$LIST -Dtest.silent=false -Doverwrite=true $2 $3

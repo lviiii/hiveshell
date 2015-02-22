@@ -1,0 +1,2 @@
+hadoop fs -rm /user/hive/warehouse/$1/*
+hadoop fs -put $2 /user/hive/warehouse/$1/$2

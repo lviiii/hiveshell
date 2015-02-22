@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+MODULES=$@
+if [[ -z $1 ]] ; then
+  MODULES="ql"
+fi
+
+for module in $MODULES
+do
+  echo Clean.. $module
+  cd $module; mvn clean -Phadoop-2 -DskipTests;cd ..
+done
+

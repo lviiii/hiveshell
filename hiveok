@@ -1,0 +1,1 @@
+cat ~/apache/oss-hive/success | xargs -i git log {} --oneline -1

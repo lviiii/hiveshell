@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+bin=`dirname "$0"`
+libs=`cat $bin/hive8`
+for lib in $libs
+do
+  if [ "$lib" == "exec" ]
+  then loc="ql"
+  else loc=$lib
+  fi
+
+  mvn deploy:deploy-file -Dfile=./build/$loc/hive-$lib-0.8.0-SNAPSHOT.jar -DgroupId=org.apache.hive -DartifactId=hive-$lib -Dversion=0.8.0-nr1000-SNAPSHOT -Dpackaging=jar -DgeneratePom=true -DrepositoryId=nexus-snapshots -Durl=http://183.110.215.183:8081/nexus/content/repositories/snapshots/
+done

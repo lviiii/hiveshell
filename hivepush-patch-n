@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+git checkout trunk
+branches=`git branch | grep 'DPAL-[0-9]\{3,4\}n$'`
+for branch in $branches
+do
+  echo pushing.. $branch 
+  git push -f origin $branch
+done

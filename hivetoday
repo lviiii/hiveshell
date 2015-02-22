@@ -1,0 +1,1 @@
+cat ~/apache/oss-hive/today | xargs -i git log {} --oneline -1

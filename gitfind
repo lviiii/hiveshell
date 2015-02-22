@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+for commit in `git fsck --lost-found | awk '{print $3}'`
+do
+  git log $commit --oneline -3
+done

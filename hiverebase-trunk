@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+
+if [[ -z $1 ]] ; then 
+  target='apache'
+else 
+  target=$1
+fi
+
+shift
+
+start=`git branch --no-color 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/\1/'`
+if [[ $start == trunk ]] ; then 
+  start=HIVE
+fi
+
+
+for branch in `cat release/$target | awk '{print $1}'`
+do
+  if [[ $branch == \** ]] ;
+  then
+    continue
+  fi
+
+  if [[ $branch == *$start* ]] ;
+  then
+    echo rebasing.. $branch 
+    git checkout $branch
+    git rebase trunk
+    if [ $? -ne 0 ]; then
+      echo "Failed rebasing $branch" 
+      exit
+    fi
+    start=
+  fi
+done
