@@ -1,0 +1,15 @@
+find . -name *.rej -exec rm {} \;
+find . -name *.orig -exec rm {} \;
+rm -rf	data/files/local_array_table_1/
+rm -rf	data/files/local_array_table_2/
+rm -rf	data/files/local_array_table_2_withfields/
+rm -rf	data/files/local_array_table_3/
+rm -rf	data/files/local_map_table_1/
+rm -rf	data/files/local_map_table_2/
+rm -rf	data/files/local_map_table_2_withfields/
+rm -rf	data/files/local_map_table_3/
+rm -rf	data/files/local_rctable/
+rm -rf	data/files/local_rctable_out/
+rm -rf	data/files/local_src_table_1/
+rm -rf	data/files/local_src_table_2/
+

@@ -1,0 +1,1 @@
+jps | grep sure | awk '{print $1}' | xargs -i jstack {} | grep CliDriver_
