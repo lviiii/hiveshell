@@ -1,0 +1,121 @@
+drop table morph_syslog;
+
+CREATE TABLE morph_syslog (syslog_pri int, syslog_timestamp string, syslog_hostname string, syslog_program string, syslog_pid int, syslog_message string)
+ROW FORMAT SERDE 'org.apache.hadoop.hive.serde2.MorphlineSerDe'
+WITH SERDEPROPERTIES ('morphline.definition' = 'grokSyslogMatch.conf', 'morphline.numRequiredMatches' = 'all', 'morphline.extract' = 'inplace') STORED AS TEXTFILE;
+
+LOAD DATA LOCAL INPATH "./syslog.txt" INTO TABLE morph_syslog;
+
+select * from morph_syslog;
+164	Feb  4 10:46:14	syslog	sshd	607	Server listening on 0.0.0.0 port 22.
+
+
+drop table morph_syslog;
+
+CREATE TABLE morph_syslog ROW FORMAT SERDE 'org.apache.hadoop.hive.serde2.MorphlineSerDe' WITH SERDEPROPERTIES (
+'morphline.definition' = 'grokSyslogMatch.conf', 'morphline.numRequiredMatches' = 'all', 'morphline.extract' = 'inplace'
+) STORED AS TEXTFILE;
+
+LOAD DATA LOCAL INPATH "./syslog.txt" INTO TABLE morph_syslog;
+
+select * from morph_syslog;
+
+drop table morph_validation;
+
+CREATE TABLE morph_validation (value string) STORED AS TEXTFILE;
+LOAD DATA LOCAL INPATH "./syslog.txt" INTO TABLE morph_validation;
+
+select * from morph_validation;
+
+select * from morph_validation (
+'morphline.definition' = 'grokSyslogMatch.conf', 
+'morphline.numRequiredMatches' = 'all', 
+'morphline.extract' = 'inplace',
+'input.wrapper.class'='org.apache.hadoop.hive.ql.io.MorphlineValidator');
+
+
+
+create temporary function morph_udf as 'org.apache.hadoop.hive.ql.udf.generic.GenericMorphlineUDF';
+create temporary function populate as 'org.apache.hadoop.hive.ql.udf.generic.GenericUDTFPopulate';
+
+create table ndetect (line string);
+load data local inpath './ndetect_example.txt' overwrite into table ndetect;
+
+select morph_udf('ndetect.txt','extract=inplace,numRequiredMatches=all', line) from ndetect;
+{"user_id":9911100,"log_dt":"20130115","log_time":"000022","apps_id":"-1275939118","client_ip":"203.229.169.202","server_time":"00:00:22 699","call_time":"00:00:22 746","cpu_time":47,"agent":"E2C"}
+{"user_id":8171072,"log_dt":"20130115","log_time":"000018","apps_id":"-1325608615","client_ip":"172.19.106.162","server_time":"00:00:22 619","call_time":"00:00:22 759","cpu_time":140,"agent":"E3G"}
+{"user_id":9911100,"log_dt":"20130115","log_time":"000022","apps_id":"882970561","client_ip":"203.229.169.204","server_time":"00:00:22 493","call_time":"00:00:22 762","cpu_time":269,"agent":"E3A"}
+{"user_id":9911100,"log_dt":"20130115","log_time":"000022","apps_id":"-1401312506","client_ip":"203.229.169.203","server_time":"00:00:22 339","call_time":"00:00:22 763","cpu_time":424,"agent":"E4C"}
+{"user_id":9911100,"log_dt":"20130115","log_time":"000022","apps_id":"-371839096","client_ip":"203.229.169.201","server_time":"00:00:22 440","call_time":"00:00:22 765","cpu_time":325,"agent":"E4B"}
+{"user_id":9911100,"log_dt":"20130115","log_time":"000022","apps_id":"-371839096","client_ip":"203.229.169.202","server_time":"00:00:22 538","call_time":"00:00:22 766","cpu_time":228,"agent":"E4A"}
+{"user_id":9911100,"log_dt":"20130115","log_time":"000022","apps_id":"1534795133","client_ip":"203.229.169.201","server_time":"00:00:22 709","call_time":"00:00:22 770","cpu_time":61,"agent":"E4B"}
+NULL
+{"user_id":9911100,"log_dt":"20130115","log_time":"000022","apps_id":"882970561","client_ip":"203.229.169.203","server_time":"00:00:22 562","call_time":"00:00:22 778","cpu_time":216,"agent":"E3C"}
+{"user_id":1999001,"log_dt":"20130115","log_time":"000022","apps_id":"1171530947","client_ip":"203.229.169.201","server_time":"00:00:22 639","call_time":"00:00:22 775","cpu_time":136,"agent":"E2B"}
+NULL
+{"user_id":1405925,"log_dt":"20130115","log_time":"000022","apps_id":"1840680959","client_ip":"192.168.200.175","server_time":"00:00:22 415","call_time":"00:00:22 783","cpu_time":368,"agent":"E1C"}
+{"user_id":8171072,"log_dt":"20130115","log_time":"000020","apps_id":"1969527781","client_ip":"172.19.106.162","server_time":"00:00:22 619","call_time":"00:00:22 797","cpu_time":178,"agent":"E3G"}
+{"user_id":9911100,"log_dt":"20130115","log_time":"000022","apps_id":"1633321425","client_ip":"203.229.169.203","server_time":"00:00:22 537","call_time":"00:00:22 798","cpu_time":261,"agent":"E4B"}
+{"user_id":9911100,"log_dt":"20130115","log_time":"000022","apps_id":"882970561","client_ip":"203.229.169.204","server_time":"00:00:22 589","call_time":"00:00:22 810","cpu_time":221,"agent":"E3B"}
+{"user_id":9911100,"log_dt":"20130115","log_time":"000022","apps_id":"882970561","client_ip":"203.229.169.201","server_time":"00:00:22 423","call_time":"00:00:22 807","cpu_time":384,"agent":"E2B"}
+
+
+select INPUT__FILE__NAME,BLOCK__OFFSET__INSIDE__FILE,morph_udf('ndetect.txt','extract=inplace,numRequiredMatches=all,parseOnly=true', line) from ndetect;
+
+true
+true
+true
+true
+true
+true
+true
+false
+true
+true
+false
+true
+true
+true
+true
+true
+
+create table ndetect (line string);
+load data local inpath './ndetect_example.txt' overwrite into table ndetect;
+
+create table ndetect_valid (user_id int, log_dt string, log_time string, apps_id string, client_ip string, server_time string, call_time string, cpu_time int, agent string);
+create table ndetect_error (value string, filename string, offset bigint);
+
+create temporary function morph_udf as 'org.apache.hadoop.hive.ql.udf.generic.GenericMorphlineUDF';
+create temporary function populate as 'org.apache.hadoop.hive.ql.udf.generic.GenericUDTFPopulate';
+
+add file file:///home/navis/hive/ndetect.txt;
+
+from (select morph_udf('ndetect.txt','extract=inplace,numRequiredMatches=all', line) parsed,INPUT__FILE__NAME file,BLOCK__OFFSET__INSIDE__FILE offset,line source from ndetect) X
+insert overwrite table ndetect_valid select populate(parsed) where parsed is not null
+insert overwrite table ndetect_error select source,file,offset where parsed is null
+;
+
+hive> select * from ndetect_valid; 
+OK
+9911100	20130115	000022	-1275939118	203.229.169.202	00:00:22 699	00:00:22 746	47	E2C
+8171072	20130115	000018	-1325608615	172.19.106.162	00:00:22 619	00:00:22 759	140	E3G
+9911100	20130115	000022	882970561	203.229.169.204	00:00:22 493	00:00:22 762	269	E3A
+9911100	20130115	000022	-1401312506	203.229.169.203	00:00:22 339	00:00:22 763	424	E4C
+9911100	20130115	000022	-371839096	203.229.169.201	00:00:22 440	00:00:22 765	325	E4B
+9911100	20130115	000022	-371839096	203.229.169.202	00:00:22 538	00:00:22 766	228	E4A
+9911100	20130115	000022	1534795133	203.229.169.201	00:00:22 709	00:00:22 770	61	E4B
+9911100	20130115	000022	882970561	203.229.169.203	00:00:22 562	00:00:22 778	216	E3C
+1999001	20130115	000022	1171530947	203.229.169.201	00:00:22 639	00:00:22 775	136	E2B
+1405925	20130115	000022	1840680959	192.168.200.175	00:00:22 415	00:00:22 783	368	E1C
+8171072	20130115	000020	1969527781	172.19.106.162	00:00:22 619	00:00:22 797	178	E3G
+9911100	20130115	000022	1633321425	203.229.169.203	00:00:22 537	00:00:22 798	261	E4B
+9911100	20130115	000022	882970561	203.229.169.204	00:00:22 589	00:00:22 810	221	E3B
+9911100	20130115	000022	882970561	203.229.169.201	00:00:22 423	00:00:22 807	384	E2B
+
+hive> select * from ndetect_error;
+OK
+null||671602549||192.168.91.143||00:00:22 676||00:00:22 769||93||E2F||	hdfs://localhost:9000/user/hive/warehouse/ndetect/ndetect_example.txt	657
+null||671602549||192.168.91.144||00:00:22 719||00:00:22 781||62||E1H||	hdfs://localhost:9000/user/hive/warehouse/ndetect/ndetect_example.txt	915
+
+
+

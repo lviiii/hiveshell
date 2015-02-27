@@ -1,0 +1,39 @@
+VERSION=0.11.0-nr1014-SNAPSHOT
+mvn deploy:deploy-file -Dpackaging=tar.gz \
+-Durl=http://nexus.nexrcorp.com:8080/nexus/content/repositories/snapshots \
+-DrepositoryId=nexus-snapshots \
+-Dfile=build/hive-$VERSION.tar.gz \
+-DartifactId=hive-dist \
+-DgroupId=com.nexr \
+-Dversion=$VERSION \
+-Dclassifier=bin
+
+VERSION=0.11.0-nr1013
+mvn deploy:deploy-file -Dpackaging=tar.gz \
+-Durl=http://nexus.nexrcorp.com:8080/nexus/content/repositories/releases \
+-DrepositoryId=nexus-releases \
+-Dfile=build/hive-$VERSION.tar.gz \
+-DartifactId=hive-dist \
+-DgroupId=com.nexr \
+-Dversion=$VERSION \
+-Dclassifier=bin
+
+
+mvn clean install -Phadoop-1,thriftif -DskipTests -Dthrift.home=$THRIFT_HOME
+
+mvn test -Dmaven.test.failure.ignore=true -Phadoop-2 -Dtest.output.overwrite=true
+
+
+mvn test -Dtest.output.overwrite=true -fn -Phadoop-2  -Dtest=TestParse,TestParseNegative,TestCliDriver,TestNegativeCliDriver,TestCompareCliDriver,TestMinimrCliDriver,TestMiniTezCliDriver,TestNegativeMinimrCliDriver,TestHBaseCliDriver,TestHBaseMinimrCliDriver,TestHBaseNegativeCliDriver,TestContribCliDriver,TestContribNegativeCliDriver
+
+
+VERSION=0.14.0-nr1002
+mvn deploy:deploy-file -Dpackaging=tar.gz \
+-Durl=http://nexus.nexrcorp.com:8080/nexus/content/repositories/releases \
+-DrepositoryId=nexus-releases \
+-Dfile=packaging/target/apache-hive-$VERSION-bin.tar.gz \
+-DartifactId=hive-dist \
+-DgroupId=com.nexr \
+-Dversion=$VERSION \
+-Dclassifier=bin
+

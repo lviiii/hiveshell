@@ -1,0 +1,15 @@
+select udf_jri(
+  'rfunc <- function(p1, p2) { p1 + p2 }
+   rfunc.output <- function() { "array<int>" }', 
+"rfunc", array(1,2,3), array(2,3,4)) from src tablesample (1 rows);
+
+select udf_jri(
+  'rfunc <- function(p1, p2) { p1 + p2 }
+   rfunc.output <- function() { "string" }', 
+"rfunc", 1, 2) from src tablesample (1 rows);
+
+
+rfunc <- function(p1, p2) { p1 + p2 }
+rfunc.output <- function() { "array<int>" }
+
+

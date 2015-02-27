@@ -1,0 +1,12 @@
+create user 'navis'@'%' identified by 'navis';
+grant all privileges on *.* to 'navis'@'%';
+grant all privileges on dbname.* to 'navis'@'%';
+
+create user 'navis'@'localhost' identified by 'navis';
+grant all privileges on *.* to 'navis'@'localhost';
+grant all privileges on dbname.* to 'navis'@'localhost';
+
+FLUSH PRIVILEGES;
+
+
+sudo system-config-printer

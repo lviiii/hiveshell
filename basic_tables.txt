@@ -1,0 +1,119 @@
+create table src (key string, value string);
+load data local inpath '../data/files/kv1.txt' overwrite into table src;
+
+create table src1 (key string, value string);
+load data local inpath '../data/files/kv3.txt' overwrite into table src1;
+
+create table srcpart (key string, value string) partitioned by (ds string, hr string);
+alter table srcpart add partition (ds='2008-04-08', hr='11');
+alter table srcpart add partition (ds='2008-04-08', hr='12');
+alter table srcpart add partition (ds='2008-04-09', hr='11');
+alter table srcpart add partition (ds='2008-04-09', hr='12');
+
+load data local inpath '../data/files/kv1.txt' overwrite into table srcpart partition (ds='2008-04-08', hr='11');
+load data local inpath '../data/files/kv1.txt' overwrite into table srcpart partition (ds='2008-04-08', hr='12');
+load data local inpath '../data/files/kv1.txt' overwrite into table srcpart partition (ds='2008-04-09', hr='11');
+load data local inpath '../data/files/kv1.txt' overwrite into table srcpart partition (ds='2008-04-09', hr='12');
+
+CREATE TABLE src_thrift
+ROW FORMAT SERDE 'org.apache.hadoop.hive.serde2.thrift.ThriftDeserializer'
+WITH SERDEPROPERTIES (
+  'serialization.class' = 'org.apache.hadoop.hive.serde2.thrift.test.Complex',
+  'serialization.format' = 'org.apache.thrift.protocol.TBinaryProtocol')
+STORED AS SEQUENCEFILE;
+
+LOAD DATA LOCAL INPATH "../data/files/complex.seq" INTO TABLE src_thrift;
+
+
+create table dest1 (key string, value string);
+create table dest2 (key string, value string);
+create table dest3 (key string, value string) partitioned by (ds string, hr string);;
+
+CREATE TABLE srcbucket (key INT, value STRING) CLUSTERED BY (key) INTO 2 BUCKETS STORED AS TEXTFILE;
+
+LOAD DATA LOCAL INPATH "../data/files/srcbucket0.txt" INTO TABLE srcbucket;
+LOAD DATA LOCAL INPATH "../data/files/srcbucket1.txt" INTO TABLE srcbucket;
+
+CREATE TABLE srcbucket2(key int, value string) CLUSTERED BY (key) INTO 4 BUCKETS STORED AS TEXTFILE;
+LOAD DATA LOCAL INPATH '../data/files/srcbucket20.txt' into table srcbucket2;
+LOAD DATA LOCAL INPATH '../data/files/srcbucket21.txt' into table srcbucket2;
+LOAD DATA LOCAL INPATH '../data/files/srcbucket22.txt' into table srcbucket2;
+LOAD DATA LOCAL INPATH '../data/files/srcbucket23.txt' into table srcbucket2;
+
+CREATE TABLE emp (empno int, ename string, job string, mgr int, hiredate string, sal float, comm float, deptno int) ROW FORMAT delimited fields terminated by ' ' STORED AS TEXTFILE;
+LOAD DATA LOCAL INPATH 'employee.txt' OVERWRITE INTO TABLE emp;
+
+CREATE TABLE dept (deptno int, dname string, loc string) ROW FORMAT delimited fields terminated by ' ' STORED AS TEXTFILE;
+LOAD DATA LOCAL INPATH 'department.txt' OVERWRITE INTO TABLE dept;
+
+
+create table birthday (id int, name string, birthday timestamp) row format delimited fields terminated by '\t';
+load data local inpath 'birthday.txt' into table birthday;
+
+create table lent (id int, name string, borrow timestamp, return timestamp) row format delimited fields terminated by '\t';
+load data local inpath 'lent.txt' into table lent;
+
+
+create external table amazon (f1 int, f2 int) row format delimited fields terminated by '\t' lines terminated by '\n' stored as textfile location '/user/navis/amazon/'
+
+create table dataTypeTable (c1 int, c2 boolean, c3 double, c4 string, c5 array<int>, c6 map<int,string>, c7 map<string,string>, c8 struct<r:string,s:int,t:double>, c9 tinyint, c10 smallint, c11 float, c12 bigint, c13 array<array<string>>, c14 map<int, map<int,int>>, c15 struct<r:int,s:struct<a:int,b:string>>, c16 array<struct<m:map<string,string>,n:int>>, c17 timestamp,  c18 decimal,  c19 binary,  c20 date) partitioned by (dt STRING);
+
+load data local inpath '../data/files/datatypes.txt' overwrite into table dataTypeTable PARTITION (dt='20090619');
+
+create table testDataTypeTable (c1 int, c2 boolean, c3 double, c4 string, c5 array<int>, c6 map<int,string>, c7 map<string,string>, c8 struct<r:string,s:int,t:double>, c9 tinyint, c10 smallint, c11 float, c12 bigint, c13 array<array<string>>, c14 map<int, map<int,int>>, c15 struct<r:int,s:struct<a:int,b:string>>, c16 array<struct<m:map<string,string>,n:int>>, c17 timestamp,  c18 decimal,  c19 binary) partitioned by (dt STRING);
+
+load data local inpath '../data/files/datatypes.txt' into table testDataTypeTable PARTITION (dt='20090619');
+
+-- v14
+create table testDataTypeTable (c1 int, c2 boolean, c3 double, c4 string, c5 array<int>, c6 map<int,string>, c7 map<string,string>, c8 struct<r:string,s:int,t:double>, c9 tinyint, c10 smallint, c11 float, c12 bigint, c13 array<array<string>>, c14 map<int, map<int,int>>, c15 struct<r:int,s:struct<a:int,b:string>>, c16 array<struct<m:map<string,string>,n:int>>, c17 timestamp,  c18 decimal,  c19 binary, c20 date, c21 varchar(20), c22 char(15), c23 binary) partitioned by (dt STRING);
+load data local inpath '../data/files/datatypes.txt' into table testDataTypeTable PARTITION (dt='20090619');
+
+CREATE TABLE alltypesorc (ctinyint tinyint, csmallint smallint, cint int, cbigint bigint, cfloat float, cdouble double, cstring1 string, cstring2 string, ctimestamp1 timestamp, ctimestamp2 timestamp, cboolean1 boolean, cboolean2 boolean) STORED AS ORC;
+load data local inpath '../data/files/alltypesorc' overwrite into table alltypesorc;
+
+create table rf_test (time timestamp, log string, params array<struct<param_id:string,special_id:string,value:float,colspecid:string>>) ROW FORMAT DELIMITED FIELDS TERMINATED BY '#' COLLECTION ITEMS TERMINATED BY '|' MAP KEYS TERMINATED BY '^';
+load data local inpath 'rf_test.txt' into table rf_test;
+
+CREATE TEMPORARY FUNCTION group_map_on AS 'org.apache.hadoop.hive.ql.udf.generic.GenericUDAFGroupOn';
+
+SELECT log, GROUP_MAP_ON(time, 'param_id', 'value', params) AS X FROM rf_test group by log;
+
+
+
+create table over10k(t tinyint,si smallint,i int,b bigint,f float,d double,bo boolean,s string,ts timestamp,dec decimal,bin binary) row format delimited fields terminated by '|';
+
+load data local inpath '../data/files/over10k' into table over10k;
+load data local inpath '../data/files/over10k' into table over10k;
+load data local inpath '../data/files/over10k' into table over10k;
+load data local inpath '../data/files/over10k' into table over10k;
+load data local inpath '../data/files/over10k' into table over10k;
+load data local inpath '../data/files/over10k' into table over10k;
+load data local inpath '../data/files/over10k' into table over10k;
+load data local inpath '../data/files/over10k' into table over10k;
+load data local inpath '../data/files/over10k' into table over10k;
+load data local inpath '../data/files/over10k' into table over10k;
+
+create table x as select 
+lead(t, 2) over (partition by 1) as l1,
+lead(si, 2) over (partition by 1) as l2,
+lead(i, 2) over (partition by 1) as l3,
+lead(b, 2) over (partition by 1) as l4,
+lead(f, 2) over (partition by 1) as l5,
+lead(d, 2) over (partition by 1) as l6,
+lead(s, 2) over (partition by 1) as l7,
+lead(ts, 2) over (partition by 1) as l8,
+lead(dec, 2) over (partition by 1) as l9,
+lead(bin, 2) over (partition by 1) as l10,
+lag(t, 2) over (partition by 1) as l11,
+lag(si, 2) over (partition by 1) as l12,
+lag(i, 2) over (partition by 1) as l13,
+lag(b, 2) over (partition by 1) as l14,
+lag(f, 2) over (partition by 1) as l15,
+lag(d, 2) over (partition by 1) as l16,
+lag(s, 2) over (partition by 1) as l17,
+lag(ts, 2) over (partition by 1) as l18,
+lag(dec, 2) over (partition by 1) as l19,
+lag(bin, 2) over (partition by 1) as l20
+from over1000k;
+
+create table x as select lead(t, 2) over (partition by 1 rows between 2 preceding and 2 following) as l1 from over10k;
